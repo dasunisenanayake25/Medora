@@ -1,73 +1,72 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
-import type { Product, ProductsResponse } from '../types/Product';
+import { ref, onMounted } from 'vue';
 
-const products = ref<Product[]>([]);
-const search = ref('');
-const loading = ref(true);
-
-const fetchMeds = async () => {
-  try {
-    const res = await fetch('https://dummyjson.com/products/category/skin-care');
-    const data: ProductsResponse = await res.json();
-    products.value = data.products;
-  } finally {
-    loading.value = false;
-  }
-};
-
-const filteredMeds = computed(() => {
-  return products.value.filter(p => 
-    p.title.toLowerCase().includes(search.value.toLowerCase())
-  );
-});
-
-onMounted(fetchMeds);
+const categories = [
+  { name: 'All Products', active: true },
+  { name: 'Medical Devices', active: false },
+  { name: 'Wellness', active: false },
+  { name: 'Personal Care', active: false },
+  { name: 'Pet Care', active: false }
+];
 </script>
 
 <template>
-  <div class="bg-gray-50 min-h-screen">
-    <div class="bg-white border-b border-gray-200 py-8">
-      <div class="container mx-auto px-6">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">Our Medicines</h2>
-        <div class="relative max-w-lg">
-          <input 
-            v-model="search"
-            type="text" 
-            placeholder="Search entire store here..." 
-            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition"
-          />
-          <span class="absolute left-3 top-3.5 text-gray-400">🔍</span>
+  <div>
+    <div class="bg-white py-4 border-b border-gray-50">
+      <div class="container mx-auto px-6 flex gap-3 overflow-x-auto no-scrollbar">
+        <button v-for="cat in categories" :key="cat.name"
+          :class="[
+            'px-5 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-all border',
+            cat.active ? 'bg-[#0b5c4b] text-white border-[#0b5c4b]' : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-emerald-300'
+          ]">
+          {{ cat.name }}
+        </button>
+      </div>
+    </div>
+
+    <div class="container mx-auto px-6 py-8">
+      <div class="bg-[#0b5c4b] rounded-[32px] overflow-hidden flex flex-col md:flex-row items-center min-h-[450px]">
+        <div class="p-12 md:w-1/2 text-white">
+          <h1 class="text-5xl font-extrabold leading-tight mb-6">
+            MedAura - The Care You Trust
+          </h1>
+          <p class="text-lg opacity-90 mb-8 leading-relaxed">
+            Get your medicines delivered to your doorstep. Safe, secure, and fast.
+          </p>
+          
+          <div class="space-y-4 mb-10">
+            <div class="flex items-center gap-3"><span class="bg-emerald-500/30 p-1 rounded-full text-xs">✔</span> 100% Genuine Medicines</div>
+            <div class="flex items-center gap-3"><span class="bg-emerald-500/30 p-1 rounded-full text-xs">✔</span> Free Delivery Over $50</div>
+            <div class="flex items-center gap-3"><span class="bg-emerald-500/30 p-1 rounded-full text-xs">✔</span> 24/7 Customer Support</div>
+          </div>
+
+          <button class="bg-white text-[#0b5c4b] font-bold px-8 py-3 rounded-xl hover:bg-gray-100 transition shadow-lg flex items-center gap-2">
+            Shop Now <span>→</span>
+          </button>
+        </div>
+
+        <div class="md:w-1/2 h-full flex justify-end">
+          <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=2030&auto=format&fit=crop" 
+            alt="Doctors" class="w-full h-[450px] object-cover object-center opacity-80" />
         </div>
       </div>
     </div>
 
-    <div class="container mx-auto p-6">
-      <div v-if="loading" class="text-center py-20 text-emerald-600 font-bold">
-        Loading Medicines...
-      </div>
-
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <div v-for="item in filteredMeds" :key="item.id" 
-             class="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 group">
-          
-          <div class="relative overflow-hidden">
-            <img :src="item.thumbnail" :alt="item.title" class="w-full h-56 object-contain p-4 group-hover:scale-105 transition-transform duration-300" />
-          </div>
-          
-          <div class="p-5 border-t border-gray-100">
-            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">{{ item.category }}</h3>
-            <h2 class="text-lg font-bold text-gray-800 mt-1 h-14 line-clamp-2">{{ item.title }}</h2>
-            
-            <div class="mt-4 flex items-center justify-between">
-              <span class="text-2xl font-black text-emerald-600">${{ item.price }}</span>
-              <button class="bg-emerald-600 hover:bg-emerald-700 text-white p-2 rounded-lg transition active:scale-90">
-                🛒
-              </button>
-            </div>
-          </div>
+    <div class="container mx-auto px-6 py-8">
+      <div class="flex justify-between items-center mb-8 border-b border-gray-100 pb-4">
+        <h2 class="text-3xl font-bold text-gray-800">Our Products</h2>
+        <div class="flex gap-4">
+           <input type="text" placeholder="Search medicines..." class="border rounded-lg px-4 py-2 text-sm" />
+           <select class="border rounded-lg px-4 py-2 text-sm bg-white"><option>All Categories</option></select>
         </div>
       </div>
+      
+      <p class="text-center text-gray-400 italic">Product grid loading...</p>
     </div>
   </div>
 </template>
+
+<style scoped>
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
